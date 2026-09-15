@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Proyecciones - Insignia Life</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-blue-800 mb-6 text-center">Cotizador de Proyecciones</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-blue-50 p-4 rounded">
+                <h3 class="font-bold text-lg mb-3">Tus Datos</h3>
+                <input type="text" id="nombre" placeholder="Nombre Completo" class="w-full p-2 mb-2 border rounded" required>
+                <input type="email" id="correo" placeholder="Correo Electrónico" class="w-full p-2 mb-2 border rounded" required>
+                <input type="tel" id="whatsapp" placeholder="WhatsApp (10 dígitos)" class="w-full p-2 mb-2 border rounded" required>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-bold text-lg mb-3">Perfil Biométrico</h3>
+                <input type="number" id="edad" placeholder="Edad (ej. 30)" class="w-full p-2 mb-2 border rounded" value="30">
+                <select id="sexo" class="w-full p-2 mb-2 border rounded">
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+                <label class="flex items-center mb-2">
+                    <input type="checkbox" id="fumador" class="mr-2"> Soy Fumador
+                </label>
+                <select id="riesgo_medico" class="w-full p-2 mb-2 border rounded">
+                    <option value="0">Salud Estándar</option>
+                    <option value="0.25">Riesgo Leve (Ej. Sobrepeso)</option>
+                    <option value="0.50">Riesgo Moderado (Ej. Hipertensión)</option>
+                </select>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded md:col-span-2">
+                <h3 class="font-bold text-lg mb-3">Configuración de la Póliza</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select id="producto" class="w-full p-2 border rounded">
+                        <option value="Universal">Insignia Universal</option>
+                        <option value="DotIL">DotIL (Garantía de Liquidez)</option>
+                    </select>
+                    <select id="moneda" class="w-full p-2 border rounded">
+                        <option value="MXN">Pesos (MXN)</option>
+                        <option value="USD">Dólares (USD)</option>
+                        <option value="UDIS">UDIS</option>
+                    </select>
+                    <input type="number" id="suma" placeholder="Suma Asegurada" class="w-full p-2 border rounded" value="1000000">
+                    <input type="number" id="prima" placeholder="Aportación Mensual" class="w-full p-2 border rounded" value="2000">
+                </div>
+            </div>
+        </div>
+
+        <button id="btnCalcular" onclick="cotizarSeguro()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition duration-200">
+            Calcular Proyección
+        </button>
+
+        <p id="mensaje_macro" class="text-sm text-center text-gray-500 mt-4 hidden"></p>
+
+        <div class="mt-8 relative h-96 w-full">
+            <canvas id="graficaProyeccion"></canvas>
+        </div>
+
+        <div class="mt-6 text-center">
+            <button id="btnDescargarPDF" onclick="descargarPDF()" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition duration-200">
+                📄 Descargar Cotización Oficial (PDF)
+            </button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
