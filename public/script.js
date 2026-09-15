@@ -38,7 +38,6 @@ async function cotizarSeguro() {
             msj.innerText = `Tipos de cambio oficiales aplicados: USD = $${datos.macroeconomia.USD_FIX} MXN | UDI = $${datos.macroeconomia.UDI} MXN`;
             msj.classList.remove('hidden');
 
-            // --- LÓGICA DEL PANEL DE IMPACTO DINÁMICO ---
             const sumaAsegurada = parseFloat(datosCliente.suma_asegurada);
             const aportacionTotal = parseFloat(datosCliente.prima_mensual) * 12 * anosSeleccionados; 
             const ultimoAno = datos.proyeccion[datos.proyeccion.length - 1];
@@ -52,13 +51,13 @@ async function cotizarSeguro() {
             document.getElementById('resFondo').innerText = formatoMoneda(fondoFinal);
             document.getElementById('resRendimiento').innerText = formatoMoneda(Math.max(rendimientoEstimado, 0));
 
-            // Actualizar los textos con el tiempo elegido
             document.getElementById('tituloResumen').innerText = `Resumen de tu Inversión (A ${anosSeleccionados} Años)`;
             document.getElementById('txtAportacionAnos').innerText = `Lo que inviertes en ${anosSeleccionados} años`;
             document.getElementById('txtFondoAnos').innerText = `Disponible al año ${anosSeleccionados}`;
 
             document.getElementById('panelResultados').classList.remove('hidden');
 
+            // Guardamos todo para el PDF premium
             datosParaPDF = { ...datosCliente, resultados: datos.proyeccion, impacto: {sumaAsegurada, aportacionTotal, fondoFinal, rendimientoEstimado} };
             document.getElementById('btnDescargarPDF').classList.remove('hidden');
         } else {
@@ -80,6 +79,15 @@ function dibujarGrafica(datosProyeccion) {
 
     if (chartInstancia) chartInstancia.destroy();
 
+    // Fondo blanco para que el PDF no salga transparente
+    Chart.plugins.register({
+        beforeDraw: function(chartInstance) {
+            var ctx = chartInstance.chart.ctx;
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+        }
+    });
+
     chartInstancia = new Chart(ctx, {
         type: 'line',
         data: {
@@ -99,39 +107,100 @@ function dibujarGrafica(datosProyeccion) {
 function descargarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth(); 
+    const formatoMoneda = (num) => '$' + num.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    doc.setFontSize(22);
-    doc.setTextColor(0, 86, 179);
-    doc.text("Proyección Actuarial Oficial", 105, 20, null, null, "center");
+    // 1. BANNER SUPERIOR (Azul Corporativo)
+    doc.setFillColor(15, 39, 85); 
+    doc.rect(0, 0, pageWidth, 35, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("PROPUESTA DE INVERSIÓN Y PROTECCIÓN", pageWidth / 2, 18, { align: "center" });
     
     doc.setFontSize(12);
-    doc.setTextColor(100);
-    doc.text(`Insignia Life - Plan: ${datosParaPDF.producto} (${datosParaPDF.moneda})`, 105, 30, null, null, "center");
-    
-    doc.setFontSize(11);
-    doc.setTextColor(0);
-    doc.text("Asegurado: " + datosParaPDF.nombre, 20, 50);
-    doc.text("Suma Asegurada: $" + parseFloat(datosParaPDF.suma_asegurada).toLocaleString('es-MX'), 20, 60);
-    doc.text("Prima Mensual: $" + parseFloat(datosParaPDF.prima_mensual).toLocaleString('es-MX'), 120, 60);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Insignia Life - Plan: ${datosParaPDF.producto} (${datosParaPDF.moneda})`, pageWidth / 2, 26, { align: "center" });
+
+    // 2. CAJA DE DATOS DEL CLIENTE (Gris claro)
+    doc.setFillColor(248, 250, 252);
+    doc.rect(15, 45, 180, 25, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.rect(15, 45, 180, 25, 'S');
+
+    doc.setTextColor(51, 65, 85);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("PERFIL DEL ASEGURADO:", 20, 52);
+    doc.setFont("helvetica", "normal");
+    doc.text(datosParaPDF.nombre.toUpperCase(), 20, 58);
+    doc.text(`Edad: ${datosParaPDF.edad} años | Sexo: ${datosParaPDF.sexo} | Fumador: ${datosParaPDF.fumador ? 'Sí' : 'No'}`, 20, 64);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("CONFIGURACIÓN DE PÓLIZA:", 110, 52);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Protección (Suma): ${formatoMoneda(datosParaPDF.suma_asegurada)}`, 110, 58);
+    doc.text(`Aportación Mensual: ${formatoMoneda(datosParaPDF.prima_mensual)}`, 110, 64);
+
+    // 3. PANEL DE IMPACTO (4 Tarjetas tipo Dashbaord)
+    const yBox = 80;
+    const boxW = 42;
+    const gap = 4;
+    const impacto = datosParaPDF.impacto;
+
+    const drawBox = (x, title, subtitle, value, colors) => {
+        // Fondo y borde
+        doc.setFillColor(colors[0], colors[1], colors[2]);
+        doc.rect(x, yBox, boxW, 25, 'F');
+        doc.setDrawColor(colors[3], colors[4], colors[5]);
+        doc.rect(x, yBox, boxW, 25, 'S');
+        // Títulos
+        doc.setTextColor(51, 65, 85);
+        doc.setFontSize(7);
+        doc.setFont("helvetica", "bold");
+        doc.text(title, x + (boxW/2), yBox + 7, { align: "center" });
+        // Valor numérico (Color específico)
+        doc.setTextColor(colors[6], colors[7], colors[8]);
+        doc.setFontSize(10);
+        doc.text(formatoMoneda(value), x + (boxW/2), yBox + 15, { align: "center" });
+        // Subtítulo
+        doc.setTextColor(100, 116, 139);
+        doc.setFontSize(6);
+        doc.setFont("helvetica", "normal");
+        doc.text(subtitle, x + (boxW/2), yBox + 21, { align: "center" });
+    };
+
+    // Colores: [Fill R,G,B, Stroke R,G,B, Text R,G,B]
+    const cBlue = [239, 246, 255, 191, 219, 254, 29, 78, 216];
+    const cGray = [248, 250, 252, 226, 232, 240, 71, 85, 105];
+    const cGreen = [240, 253, 244, 187, 247, 208, 21, 128, 61];
+    const cYellow = [254, 252, 232, 254, 240, 138, 161, 98, 7];
+
+    drawBox(15, "PROTECCIÓN", "Inmediata", impacto.sumaAsegurada, cBlue);
+    drawBox(15 + boxW + gap, "APORTACIÓN", `Total en ${datosParaPDF.anos_proyeccion} años`, impacto.aportacionTotal, cGray);
+    drawBox(15 + (boxW + gap)*2, "FONDO ESPERADO", `Disponible al año ${datosParaPDF.anos_proyeccion}`, impacto.fondoFinal, cGreen);
+    drawBox(15 + (boxW + gap)*3, "RENDIMIENTO NETO", "Ganancia a favor", Math.max(impacto.rendimientoEstimado, 0), cYellow);
+
+    // 4. GRÁFICA
+    doc.setTextColor(15, 39, 85);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Proyección de Crecimiento a ${datosParaPDF.anos_proyeccion} Años`, pageWidth / 2, yBox + 40, { align: "center" });
 
     const canvas = document.getElementById('graficaProyeccion');
     const imgData = canvas.toDataURL('image/png', 1.0);
-    doc.addImage(imgData, 'PNG', 15, 75, 180, 90);
+    doc.addImage(imgData, 'PNG', 15, yBox + 45, 180, 90);
 
-    const ultimoAno = datosParaPDF.resultados[datosParaPDF.resultados.length - 1];
-    doc.setFontSize(14);
-    doc.setTextColor(0, 86, 179);
-    doc.text("Resumen a Largo Plazo (Año " + ultimoAno.ano + ")", 20, 185);
+    // 5. FOOTER CORPORATIVO
+    doc.setDrawColor(203, 213, 225);
+    doc.line(15, 275, 195, 275);
     
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.text("Fondo Objetivo Proyectado: $" + ultimoAno.fondo_total.toLocaleString('es-MX'), 20, 195);
-    doc.text("Valor de Rescate Líquido: $" + ultimoAno.valor_rescate.toLocaleString('es-MX'), 20, 205);
+    doc.setTextColor(148, 163, 184);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text("Las cantidades presentadas son estimaciones basadas en rendimientos proyectados y no constituyen un contrato.", pageWidth / 2, 282, { align: "center" });
+    doc.text(`Documento generado el ${new Date().toLocaleDateString()} | Plataforma Exclusiva para Asesores Patrimoniales`, pageWidth / 2, 287, { align: "center" });
 
-    doc.setFontSize(9);
-    doc.setTextColor(150);
-    doc.text("Generado el " + new Date().toLocaleDateString() + " con fines ilustrativos.", 105, 270, null, null, "center");
-    doc.text("Asesor Patrimonial | Documento Confidencial", 105, 280, null, null, "center");
-
-    doc.save("Proyeccion_" + datosParaPDF.nombre.replace(/\s+/g, '_') + ".pdf");
+    doc.save(`Propuesta_${datosParaPDF.nombre.replace(/\s+/g, '_')}.pdf`);
 }
