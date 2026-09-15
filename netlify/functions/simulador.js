@@ -32,6 +32,8 @@ function proyectarSeguro(datos, factor) {
     const prima = parseFloat(datos.prima_mensual || 2000) * factor;
     const riesgoMedico = parseFloat(datos.sobremortalidad_medica || 0.0);
     const producto = datos.producto || 'Universal';
+    const anosProyeccion = parseInt(datos.anos_proyeccion || 20);
+    const mesesTotales = anosProyeccion * 12;
     
     let edadAjustada = edad;
     if (sexo === 'F') edadAjustada -= 3;
@@ -46,7 +48,7 @@ function proyectarSeguro(datos, factor) {
     let fondo = 0.0;
     let proyeccion = [];
 
-    for (let mes = 1; mes <= 240; mes++) {
+    for (let mes = 1; mes <= mesesTotales; mes++) {
         fondo += prima;
         fondo *= (1 + tasaMensual);
         let mnr = Math.max(suma - fondo, 0.05 * fondo);
@@ -106,12 +108,11 @@ exports.handler = async function(event, context) {
 
         if (user && pass && dest) {
             let transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: user, pass: pass }});
-            // AQUÍ AGREGAMOS EL AWAIT PARA QUE ESPERE A GMAIL
             await transporter.sendMail({
                 from: user,
                 to: dest,
                 subject: `🔥 Nuevo Lead: ${body.nombre}`,
-                text: `Nombre: ${body.nombre}\nWhatsApp: ${body.whatsapp}\nCorreo: ${body.correo}\nCotizó: ${body.producto} por $${body.suma_asegurada} ${body.moneda}`
+                text: `Nombre: ${body.nombre}\nWhatsApp: ${body.whatsapp}\nCorreo: ${body.correo}\nCotizó: ${body.producto} por $${body.suma_asegurada} ${body.moneda} a ${body.anos_proyeccion} años.`
             });
         }
 
