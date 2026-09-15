@@ -35,7 +35,24 @@ async function cotizarSeguro() {
             msj.innerText = `Tipos de cambio oficiales aplicados: USD = $${datos.macroeconomia.USD_FIX} MXN | UDI = $${datos.macroeconomia.UDI} MXN`;
             msj.classList.remove('hidden');
 
-            datosParaPDF = { ...datosCliente, resultados: datos.proyeccion };
+            // --- LÓGICA DEL PANEL DE IMPACTO ---
+            const sumaAsegurada = parseFloat(datosCliente.suma_asegurada);
+            const aportacionTotal = parseFloat(datosCliente.prima_mensual) * 12 * 20; // 20 años
+            const ultimoAno = datos.proyeccion[datos.proyeccion.length - 1];
+            const fondoFinal = ultimoAno.fondo_total;
+            const rendimientoEstimado = fondoFinal - aportacionTotal;
+
+            const formatoMoneda = (num) => '$' + num.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            document.getElementById('resSuma').innerText = formatoMoneda(sumaAsegurada);
+            document.getElementById('resAportacion').innerText = formatoMoneda(aportacionTotal);
+            document.getElementById('resFondo').innerText = formatoMoneda(fondoFinal);
+            document.getElementById('resRendimiento').innerText = formatoMoneda(Math.max(rendimientoEstimado, 0));
+
+            document.getElementById('panelResultados').classList.remove('hidden');
+            // -----------------------------------
+
+            datosParaPDF = { ...datosCliente, resultados: datos.proyeccion, impacto: {sumaAsegurada, aportacionTotal, fondoFinal, rendimientoEstimado} };
             document.getElementById('btnDescargarPDF').classList.remove('hidden');
         } else {
             alert("Error: " + datos.error);
