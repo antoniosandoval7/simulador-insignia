@@ -7,6 +7,8 @@ async function cotizarSeguro() {
     btn.disabled = true;
 
     try {
+        const anosSeleccionados = parseInt(document.getElementById('anos_proyeccion').value) || 20;
+
         const datosCliente = {
             nombre: document.getElementById('nombre').value || "Cliente",
             correo: document.getElementById('correo').value || "sin@correo.com",
@@ -18,6 +20,7 @@ async function cotizarSeguro() {
             prima_mensual: parseFloat(document.getElementById('prima').value),
             producto: document.getElementById('producto').value,
             moneda: document.getElementById('moneda').value,
+            anos_proyeccion: anosSeleccionados,
             sobremortalidad_medica: parseFloat(document.getElementById('riesgo_medico').value)
         };
 
@@ -35,9 +38,9 @@ async function cotizarSeguro() {
             msj.innerText = `Tipos de cambio oficiales aplicados: USD = $${datos.macroeconomia.USD_FIX} MXN | UDI = $${datos.macroeconomia.UDI} MXN`;
             msj.classList.remove('hidden');
 
-            // --- LÓGICA DEL PANEL DE IMPACTO ---
+            // --- LÓGICA DEL PANEL DE IMPACTO DINÁMICO ---
             const sumaAsegurada = parseFloat(datosCliente.suma_asegurada);
-            const aportacionTotal = parseFloat(datosCliente.prima_mensual) * 12 * 20; // 20 años
+            const aportacionTotal = parseFloat(datosCliente.prima_mensual) * 12 * anosSeleccionados; 
             const ultimoAno = datos.proyeccion[datos.proyeccion.length - 1];
             const fondoFinal = ultimoAno.fondo_total;
             const rendimientoEstimado = fondoFinal - aportacionTotal;
@@ -49,8 +52,12 @@ async function cotizarSeguro() {
             document.getElementById('resFondo').innerText = formatoMoneda(fondoFinal);
             document.getElementById('resRendimiento').innerText = formatoMoneda(Math.max(rendimientoEstimado, 0));
 
+            // Actualizar los textos con el tiempo elegido
+            document.getElementById('tituloResumen').innerText = `Resumen de tu Inversión (A ${anosSeleccionados} Años)`;
+            document.getElementById('txtAportacionAnos').innerText = `Lo que inviertes en ${anosSeleccionados} años`;
+            document.getElementById('txtFondoAnos').innerText = `Disponible al año ${anosSeleccionados}`;
+
             document.getElementById('panelResultados').classList.remove('hidden');
-            // -----------------------------------
 
             datosParaPDF = { ...datosCliente, resultados: datos.proyeccion, impacto: {sumaAsegurada, aportacionTotal, fondoFinal, rendimientoEstimado} };
             document.getElementById('btnDescargarPDF').classList.remove('hidden');
