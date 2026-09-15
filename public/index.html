@@ -65,7 +65,7 @@
             <!-- Sección 3: Configuración de la Póliza -->
             <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 md:col-span-2">
                 <h3 class="font-bold text-lg mb-4 text-gray-800 border-b border-gray-200 pb-2">Configuración de la Póliza</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Producto</label>
                         <select id="producto" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
@@ -99,6 +99,12 @@
                             <input type="number" id="prima" class="w-full pl-7 p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" value="2000">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Años a Proyectar</label>
+                        <div class="relative">
+                            <input type="number" id="anos_proyeccion" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" value="20">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,9 +115,9 @@
 
         <p id="mensaje_macro" class="text-sm text-center text-gray-500 mt-4 hidden bg-gray-50 p-2 rounded border border-gray-200"></p>
 
-        <!-- PANEL DE IMPACTO (Oculto por defecto) -->
+        <!-- PANEL DE IMPACTO -->
         <div id="panelResultados" class="hidden mt-8">
-            <h2 class="text-2xl font-bold text-center text-blue-900 mb-6">Resumen de tu Inversión (A 20 Años)</h2>
+            <h2 id="tituloResumen" class="text-2xl font-bold text-center text-blue-900 mb-6">Resumen de tu Inversión</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
                 
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center shadow-sm hover:shadow-md transition">
@@ -123,13 +129,13 @@
                 <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center shadow-sm hover:shadow-md transition">
                     <p class="text-sm text-gray-600 font-bold uppercase tracking-wide">Aportación Total</p>
                     <p id="resAportacion" class="text-2xl font-extrabold text-gray-700 mt-2">$0</p>
-                    <p class="text-xs text-gray-500 mt-1">Lo que inviertes en 20 años</p>
+                    <p id="txtAportacionAnos" class="text-xs text-gray-500 mt-1">Lo que inviertes en X años</p>
                 </div>
 
                 <div class="bg-green-50 p-4 rounded-xl border border-green-200 text-center shadow-sm hover:shadow-md transition">
                     <p class="text-sm text-green-800 font-bold uppercase tracking-wide">Fondo Proyectado</p>
                     <p id="resFondo" class="text-2xl font-extrabold text-green-600 mt-2">$0</p>
-                    <p class="text-xs text-green-600/80 mt-1">Disponible al año 20</p>
+                    <p id="txtFondoAnos" class="text-xs text-green-600/80 mt-1">Disponible al año X</p>
                 </div>
 
                 <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-center shadow-sm hover:shadow-md transition">
