@@ -108,7 +108,41 @@
         </button>
 
         <p id="mensaje_macro" class="text-sm text-center text-gray-500 mt-4 hidden bg-gray-50 p-2 rounded border border-gray-200"></p>
+<!-- PANEL DE IMPACTO (Oculto por defecto) -->
+        <div id="panelResultados" class="hidden mt-8 animate-fade-in-up">
+            <h2 class="text-2xl font-bold text-center text-blue-900 mb-6">Resumen de tu Inversión (A 20 Años)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+                
+                <!-- Tarjeta 1: Protección -->
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center shadow-sm hover:shadow-md transition">
+                    <p class="text-sm text-blue-800 font-bold uppercase tracking-wide">Protección Inmediata</p>
+                    <p id="resSuma" class="text-2xl font-extrabold text-blue-600 mt-2">$0</p>
+                    <p class="text-xs text-blue-600/80 mt-1">Desde el día 1</p>
+                </div>
 
+                <!-- Tarjeta 2: Aportación -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center shadow-sm hover:shadow-md transition">
+                    <p class="text-sm text-gray-600 font-bold uppercase tracking-wide">Aportación Total</p>
+                    <p id="resAportacion" class="text-2xl font-extrabold text-gray-700 mt-2">$0</p>
+                    <p class="text-xs text-gray-500 mt-1">Lo que inviertes en 20 años</p>
+                </div>
+
+                <!-- Tarjeta 3: Fondo -->
+                <div class="bg-green-50 p-4 rounded-xl border border-green-200 text-center shadow-sm hover:shadow-md transition">
+                    <p class="text-sm text-green-800 font-bold uppercase tracking-wide">Fondo Proyectado</p>
+                    <p id="resFondo" class="text-2xl font-extrabold text-green-600 mt-2">$0</p>
+                    <p class="text-xs text-green-600/80 mt-1">Disponible al año 20</p>
+                </div>
+
+                <!-- Tarjeta 4: Rendimiento -->
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-center shadow-sm hover:shadow-md transition">
+                    <p class="text-sm text-yellow-800 font-bold uppercase tracking-wide">Rendimiento a Favor</p>
+                    <p id="resRendimiento" class="text-2xl font-extrabold text-yellow-600 mt-2">$0</p>
+                    <p class="text-xs text-yellow-600/80 mt-1">Ganancia neta estimada</p>
+                </div>
+
+            </div>
+        </div>
         <div class="mt-8 relative h-96 w-full">
             <canvas id="graficaProyeccion"></canvas>
         </div>
