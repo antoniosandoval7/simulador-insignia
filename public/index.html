@@ -8,65 +8,113 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold text-blue-800 mb-6 text-center">Cotizador de Proyecciones</h1>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8 font-sans">
+    <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-xl border border-gray-200">
+        <h1 class="text-3xl font-extrabold text-blue-900 mb-8 text-center">Cotizador de Proyecciones</h1>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="bg-blue-50 p-4 rounded">
-                <h3 class="font-bold text-lg mb-3">Tus Datos</h3>
-                <input type="text" id="nombre" placeholder="Nombre Completo" class="w-full p-2 mb-2 border rounded" required>
-                <input type="email" id="correo" placeholder="Correo Electrónico" class="w-full p-2 mb-2 border rounded" required>
-                <input type="tel" id="whatsapp" placeholder="WhatsApp (10 dígitos)" class="w-full p-2 mb-2 border rounded" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- Sección 1: Tus Datos -->
+            <div class="bg-blue-50/50 p-5 rounded-lg border border-blue-100">
+                <h3 class="font-bold text-lg mb-4 text-blue-800 border-b border-blue-200 pb-2">Tus Datos</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
+                        <input type="text" id="nombre" placeholder="Ej. Juan Pérez" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
+                        <input type="email" id="correo" placeholder="ejemplo@correo.com" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp</label>
+                        <input type="tel" id="whatsapp" placeholder="10 dígitos" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded">
-                <h3 class="font-bold text-lg mb-3">Perfil Biométrico</h3>
-                <input type="number" id="edad" placeholder="Edad (ej. 30)" class="w-full p-2 mb-2 border rounded" value="30">
-                <select id="sexo" class="w-full p-2 mb-2 border rounded">
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                </select>
-                <label class="flex items-center mb-2">
-                    <input type="checkbox" id="fumador" class="mr-2"> Soy Fumador
-                </label>
-                <select id="riesgo_medico" class="w-full p-2 mb-2 border rounded">
-                    <option value="0">Salud Estándar</option>
-                    <option value="0.25">Riesgo Leve (Ej. Sobrepeso)</option>
-                    <option value="0.50">Riesgo Moderado (Ej. Hipertensión)</option>
-                </select>
+            <!-- Sección 2: Perfil Biométrico -->
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                <h3 class="font-bold text-lg mb-4 text-gray-800 border-b border-gray-200 pb-2">Perfil Biométrico</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Edad Actual</label>
+                        <input type="number" id="edad" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" value="30">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Género</label>
+                        <select id="sexo" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Estado de Salud</label>
+                        <select id="riesgo_medico" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="0">Salud Estándar</option>
+                            <option value="0.25">Riesgo Leve (Ej. Sobrepeso)</option>
+                            <option value="0.50">Riesgo Moderado (Ej. Hipertensión)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-2">
+                        <input type="checkbox" id="fumador" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        <label for="fumador" class="ml-2 block text-sm font-semibold text-gray-700">Soy Fumador</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded md:col-span-2">
-                <h3 class="font-bold text-lg mb-3">Configuración de la Póliza</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <select id="producto" class="w-full p-2 border rounded">
-                        <option value="Universal">Insignia Universal</option>
-                        <option value="DotIL">DotIL (Garantía de Liquidez)</option>
-                    </select>
-                    <select id="moneda" class="w-full p-2 border rounded">
-                        <option value="MXN">Pesos (MXN)</option>
-                        <option value="USD">Dólares (USD)</option>
-                        <option value="UDIS">UDIS</option>
-                    </select>
-                    <input type="number" id="suma" placeholder="Suma Asegurada" class="w-full p-2 border rounded" value="1000000">
-                    <input type="number" id="prima" placeholder="Aportación Mensual" class="w-full p-2 border rounded" value="2000">
+            <!-- Sección 3: Configuración de la Póliza -->
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 md:col-span-2">
+                <h3 class="font-bold text-lg mb-4 text-gray-800 border-b border-gray-200 pb-2">Configuración de la Póliza</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Producto</label>
+                        <select id="producto" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="Universal">Insignia Universal</option>
+                            <option value="DotIL">DotIL (Garantía de Liquidez)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Moneda</label>
+                        <select id="moneda" class="w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="MXN">Pesos (MXN)</option>
+                            <option value="USD">Dólares (USD)</option>
+                            <option value="UDIS">UDIS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Suma Asegurada</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" id="suma" class="w-full pl-7 p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" value="1000000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Prima Mensual</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" id="prima" class="w-full pl-7 p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" value="2000">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <button id="btnCalcular" onclick="cotizarSeguro()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition duration-200">
+        <button id="btnCalcular" onclick="cotizarSeguro()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg shadow-md transition duration-300 text-lg">
             Calcular Proyección
         </button>
 
-        <p id="mensaje_macro" class="text-sm text-center text-gray-500 mt-4 hidden"></p>
+        <p id="mensaje_macro" class="text-sm text-center text-gray-500 mt-4 hidden bg-gray-50 p-2 rounded border border-gray-200"></p>
 
         <div class="mt-8 relative h-96 w-full">
             <canvas id="graficaProyeccion"></canvas>
         </div>
 
         <div class="mt-6 text-center">
-            <button id="btnDescargarPDF" onclick="descargarPDF()" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition duration-200">
+            <button id="btnDescargarPDF" onclick="descargarPDF()" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300">
                 📄 Descargar Cotización Oficial (PDF)
             </button>
         </div>
