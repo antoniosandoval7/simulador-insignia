@@ -57,7 +57,6 @@ async function cotizarSeguro() {
 
             document.getElementById('panelResultados').classList.remove('hidden');
 
-            // Guardamos todo para el PDF premium
             datosParaPDF = { ...datosCliente, resultados: datos.proyeccion, impacto: {sumaAsegurada, aportacionTotal, fondoFinal, rendimientoEstimado} };
             document.getElementById('btnDescargarPDF').classList.remove('hidden');
         } else {
@@ -79,14 +78,18 @@ function dibujarGrafica(datosProyeccion) {
 
     if (chartInstancia) chartInstancia.destroy();
 
-    // Fondo blanco para que el PDF no salga transparente
-    Chart.plugins.register({
-        beforeDraw: function(chartInstance) {
-            var ctx = chartInstance.chart.ctx;
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+    // Plugin moderno para asegurar el fondo blanco en el PDF
+    const pluginFondoBlanco = {
+        id: 'fondoBlancoPersonalizado',
+        beforeDraw: (chart) => {
+            const ctx = chart.canvas.getContext('2d');
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, chart.width, chart.height);
+            ctx.restore();
         }
-    });
+    };
 
     chartInstancia = new Chart(ctx, {
         type: 'line',
@@ -100,7 +103,8 @@ function dibujarGrafica(datosProyeccion) {
         options: {
             responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
             plugins: { tooltip: { callbacks: { label: (c) => c.dataset.label + ': $' + c.parsed.y.toLocaleString('es-MX') } } }
-        }
+        },
+        plugins: [pluginFondoBlanco] // Conectamos el plugin de forma correcta
     });
 }
 
@@ -150,28 +154,26 @@ function descargarPDF() {
     const impacto = datosParaPDF.impacto;
 
     const drawBox = (x, title, subtitle, value, colors) => {
-        // Fondo y borde
         doc.setFillColor(colors[0], colors[1], colors[2]);
         doc.rect(x, yBox, boxW, 25, 'F');
         doc.setDrawColor(colors[3], colors[4], colors[5]);
         doc.rect(x, yBox, boxW, 25, 'S');
-        // Títulos
+        
         doc.setTextColor(51, 65, 85);
         doc.setFontSize(7);
         doc.setFont("helvetica", "bold");
         doc.text(title, x + (boxW/2), yBox + 7, { align: "center" });
-        // Valor numérico (Color específico)
+        
         doc.setTextColor(colors[6], colors[7], colors[8]);
         doc.setFontSize(10);
         doc.text(formatoMoneda(value), x + (boxW/2), yBox + 15, { align: "center" });
-        // Subtítulo
+        
         doc.setTextColor(100, 116, 139);
         doc.setFontSize(6);
         doc.setFont("helvetica", "normal");
         doc.text(subtitle, x + (boxW/2), yBox + 21, { align: "center" });
     };
 
-    // Colores: [Fill R,G,B, Stroke R,G,B, Text R,G,B]
     const cBlue = [239, 246, 255, 191, 219, 254, 29, 78, 216];
     const cGray = [248, 250, 252, 226, 232, 240, 71, 85, 105];
     const cGreen = [240, 253, 244, 187, 247, 208, 21, 128, 61];
