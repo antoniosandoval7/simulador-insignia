@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
 
-// --- 1. BANXICO API ---
 async function obtenerMacro() {
     const token = process.env.BANXICO_TOKEN || '';
     const fallback = { UDI: 8.50, USD_FIX: 19.50 };
@@ -17,7 +16,6 @@ async function obtenerMacro() {
             }
             return fb;
         };
-
         const udi = await fetchSerie('SP68257', fallback.UDI);
         const usd = await fetchSerie('SF43718', fallback.USD_FIX);
         return { UDI: udi, USD_FIX: usd };
@@ -26,7 +24,6 @@ async function obtenerMacro() {
     }
 }
 
-// --- 2. MOTOR ACTUARIAL ---
 function proyectarSeguro(datos, factor) {
     const edad = parseInt(datos.edad || 30);
     const sexo = (datos.sexo || 'M').toUpperCase();
@@ -90,7 +87,6 @@ function proyectarSeguro(datos, factor) {
     return proyeccion;
 }
 
-// --- 3. CORREO Y RESPUESTA FINAL ---
 exports.handler = async function(event, context) {
     if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metodo no permitido" };
 
@@ -102,25 +98,23 @@ exports.handler = async function(event, context) {
         if (body.moneda === 'USD') factor = macro.USD_FIX;
         else if (body.moneda === 'UDIS') factor = macro.UDI;
 
-        // Correr motor
         const resultados = proyectarSeguro(body, factor);
         
-        // Enviar Correo Electrónico
         const user = process.env.EMAIL_USUARIO;
         const pass = process.env.EMAIL_PASSWORD;
         const dest = process.env.EMAIL_DESTINO;
 
         if (user && pass && dest) {
             let transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: user, pass: pass }});
-            transporter.sendMail({
+            // AQUÍ AGREGAMOS EL AWAIT PARA QUE ESPERE A GMAIL
+            await transporter.sendMail({
                 from: user,
                 to: dest,
                 subject: `🔥 Nuevo Lead: ${body.nombre}`,
                 text: `Nombre: ${body.nombre}\nWhatsApp: ${body.whatsapp}\nCorreo: ${body.correo}\nCotizó: ${body.producto} por $${body.suma_asegurada} ${body.moneda}`
-            }).catch(e => console.log("Error correo oculto:", e));
+            });
         }
 
-        // Enviar respuesta a la gráfica web
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
